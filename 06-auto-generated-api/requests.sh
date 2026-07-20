@@ -10,25 +10,40 @@
 set -euo pipefail
 BASE="${BASE:-localhost:8000}"
 
-# Trim the response to just the useful payload: pull out the walker's
-# reports (or a function's result) and drop the internal `_jac_*` fields.
+# Turn a response into a short human-readable summary: pull out the walker's
+# reports, and print profiles as `@name` and tweets as `name: text`.
 FILTER='
 import sys, json
 d = json.load(sys.stdin)
-def clean(x):
-    if isinstance(x, dict):
-        return {k: clean(v) for k, v in x.items() if not k.startswith("_jac_")}
+
+def show(x, pad="  "):
     if isinstance(x, list):
-        return [clean(v) for v in x]
-    return x
+        for item in x:
+            show(item, pad)
+    elif isinstance(x, dict):
+        if "content" in x and "author_username" in x:
+            print(pad + x["author_username"] + ": " + x["content"])
+        elif "username" in x:
+            line = pad + "@" + x["username"]
+            if x.get("bio"):
+                line += " - " + x["bio"]
+            print(line)
+            show(x.get("tweets") or [], pad + "  ")
+
 if not d.get("ok"):
     print("  error:", (d.get("error") or {}).get("message"))
 else:
     data = d.get("data") or {}
-    print(json.dumps(clean(data.get("reports") or data.get("result")), indent=2))
+    payload = data.get("reports")
+    if payload is None:
+        payload = data.get("result")
+    if payload in (None, [], [[]], {}):
+        print("  (nothing)")
+    else:
+        show(payload)
 '
 
-# POST helper: path + optional JSON body (defaults to {}), print the payload.
+# POST helper: path + optional JSON body (defaults to {}), print a summary.
 post() {
     local path="$1" body="${2:-{\}}"
     echo "> POST /$path  $body"
