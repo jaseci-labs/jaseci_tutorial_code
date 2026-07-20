@@ -10,11 +10,29 @@
 set -euo pipefail
 BASE="${BASE:-localhost:8000}"
 
-# POST helper: path + optional JSON body (defaults to {}), pretty-print.
+# Trim the response to just the useful payload: pull out the walker's
+# reports (or a function's result) and drop the internal `_jac_*` fields.
+FILTER='
+import sys, json
+d = json.load(sys.stdin)
+def clean(x):
+    if isinstance(x, dict):
+        return {k: clean(v) for k, v in x.items() if not k.startswith("_jac_")}
+    if isinstance(x, list):
+        return [clean(v) for v in x]
+    return x
+if not d.get("ok"):
+    print("  error:", (d.get("error") or {}).get("message"))
+else:
+    data = d.get("data") or {}
+    print(json.dumps(clean(data.get("reports") or data.get("result")), indent=2))
+'
+
+# POST helper: path + optional JSON body (defaults to {}), print the payload.
 post() {
     local path="$1" body="${2:-{\}}"
     echo "> POST /$path  $body"
-    curl -s -X POST "$BASE/$path" -H 'Content-Type: application/json' -d "$body" | python3 -m json.tool
+    curl -s -X POST "$BASE/$path" -H 'Content-Type: application/json' -d "$body" | python3 -c "$FILTER"
     echo
 }
 
