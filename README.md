@@ -16,5 +16,6 @@ jac --version
 | 4 | [`04-osp/`](04-osp/README.md)                | Object-Spatial Programming basics |
 | 5 | [`05-data-model/`](05-data-model/README.md)  | Persistence via `root` |
 | 6 | [`06-auto-generated-api/`](06-auto-generated-api/README.md) | REST API from `pub` functions and walkers |
+| 7 | [`07-authentication/`](07-authentication/README.md) | Auth & multi-user: `pub` → `priv`, per-user `root` |
 
 Each episode's `README.md` covers what the code does, how to run it, and what to notice. `cd` into one and follow along.
