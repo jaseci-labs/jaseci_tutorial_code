@@ -1,0 +1,5 @@
+[project]
+name = "littlex-ai"
+
+[plugins.byllm.model]
+default_model = "gpt-4o"
