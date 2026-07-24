@@ -18,5 +18,6 @@ jac --version
 | 6 | [`06-auto-generated-api/`](06-auto-generated-api/README.md) | REST API from `pub` functions and walkers |
 | 7 | [`07-authentication/`](07-authentication/README.md) | Auth & multi-user: `pub` → `priv`, per-user `root` |
 | 8 | [`08-agentic-ai/`](08-agentic-ai/README.md) | Agentic AI: the seven `by llm()` + OSP patterns |
+| 9 | [`09-frontend/`](09-frontend/README.md) | The complete LittleX — full backend + `cl` frontend |
 
 Each episode's `README.md` covers what the code does, how to run it, and what to notice. `cd` into one and follow along.
